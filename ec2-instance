@@ -1,0 +1,46 @@
+resource "aws_instance" "web-server" {
+    ami = "ami-05fb0b8c1424f266b"
+    instance_type = "t2.micro"
+    tags = {
+        Name = "web server"
+        Description = "httpd server"
+    }
+    user_data = <<-EOF
+                #!/bin/bash
+                sudo apt update
+                sudo apt-get install nginx -y
+                sudo service nginx start
+                sudo chkconfig nginx on
+                EOF
+    
+    key_name = "pem_linux_ohio"
+    vpc_security_group_ids = ["sg-080612042159e6e15"]
+}
+
+output publicIP {
+    value = aws_instance.web-server.public_ip
+}
+
+
+
+/* creating sg
+resource "aws_security_groups" "ssh-access" {
+    name = "ssh-access"
+    description = "Allow shh connection"
+    ingress = {
+        from_port = 22
+        to_port = 22
+        protocol = "tcp"
+        cidr_block = ["0.0.0.0/0"]
+    }
+}
+call - > [aws_security_groups.ssh-access.id]  */
+
+/* key pair 
+resource "aws_key_pair" "example_keypair" {
+  key_name   = "example-keypair"  # Replace with your desired key pair name
+  public_key = file("~/.ssh/id_rsa.pub")  # Replace with the path to your public key file
+}
+
+*/
+
